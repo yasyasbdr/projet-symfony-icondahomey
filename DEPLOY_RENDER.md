@@ -20,7 +20,7 @@ git push
 1. Sur **dashboard.render.com** → **New +** → **PostgreSQL**.
 2. Nom : `icon-dahomey-db`, région au choix, plan **Free** → **Create Database**.
 3. Attends que le statut passe à **Available**.
-4. Copie l'**Internal Database URL** (elle commence par `postgres://...`).
+4. Copie l'**Internal Database URL** (elle commence par `postgres://...`). postgresql://icon_dahomey_db_user:TCzDCWElVdIEYgPMJ8MhuGQAxjSkwSis@dpg-d96mq69o3t8c738oci4g-a/icon_dahomey_db
 
 ## Étape 2 — Créer le service web
 
@@ -50,6 +50,8 @@ Mets-le sous cette forme (scheme `postgresql` + version + charset) :
 
 ```
 postgresql://user:pass@host:5432/db?serverVersion=16&charset=utf8
+
+postgresql://icon_dahomey_db_user:TCzDCWElVdIEYgPMJ8MhuGQAxjSkwSis@dpg-d96mq69o3t8c738oci4g-a:5432/icon_dahomey_db?serverVersion=16&charset=utf8
 ```
 
 Enregistre → Render relance un déploiement.
