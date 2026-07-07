@@ -6,6 +6,7 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -25,6 +26,7 @@ abstract class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product:read'])]
     protected ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
@@ -33,22 +35,27 @@ abstract class Product
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank]
+    #[Groups(['product:read'])]
     protected ?string $name = null;
 
     #[ORM\Column(length: 200, unique: true)]
+    #[Groups(['product:read'])]
     protected ?string $slug = null;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['product:detail'])]
     protected ?string $description = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
     #[Assert\Positive]
+    #[Groups(['product:read'])]
     protected ?string $basePrice = null;
 
     #[ORM\Column]
     protected bool $isPublished = true;
 
     #[ORM\Column]
+    #[Groups(['product:read'])]
     protected bool $isCustomizable = false;
 
     #[ORM\Column]
@@ -95,6 +102,7 @@ abstract class Product
     }
 
     /** Retourne le type technique (implemente par chaque sous-classe). */
+    #[Groups(['product:read'])]
     abstract public function getType(): string;
 
     public function getId(): ?int
@@ -285,5 +293,19 @@ abstract class Product
     public function getOrderItems(): Collection
     {
         return $this->orderItems;
+    }
+
+    /** Nom de la categorie, expose dans l'API (evite de serialiser toute l'entite Category). */
+    #[Groups(['product:read'])]
+    public function getCategoryName(): ?string
+    {
+        return $this->category?->getName();
+    }
+
+    /** Nom de fichier de l'image principale, expose dans l'API. */
+    #[Groups(['product:read'])]
+    public function getMainImageFilename(): ?string
+    {
+        return $this->getMainImage()?->getFilename();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Creation physique (vetement/accessoire au crochet).
@@ -12,9 +13,11 @@ use Doctrine\ORM\Mapping as ORM;
 class PhysicalCreation extends Product
 {
     #[ORM\Column(nullable: true)]
+    #[Groups(['product:detail'])]
     private ?int $stock = null;
 
     #[ORM\Column]
+    #[Groups(['product:detail'])]
     private bool $requiresMeasurements = false;
 
     /** Patron PDF telechargeable eventuellement associe a cette creation. */

@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    name: PHPUnit
+    name: Lint & Tests
     runs-on: ubuntu-latest
 
     services:
@@ -38,6 +38,17 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
+      # --- Qualité : linters Symfony ---
+      - name: Lint YAML
+        run: php bin/console lint:yaml config --parse-tags
+
+      - name: Lint Twig
+        run: php bin/console lint:twig templates
+
+      - name: Lint container (services)
+        run: php bin/console lint:container
+
+      # --- Base de test ---
       - name: Prepare test database
         env:
           DATABASE_URL: "mysql://root:root@127.0.0.1:3306/icon_dahomey_test?serverVersion=8.0.32&charset=utf8mb4"
@@ -45,6 +56,7 @@ jobs:
           php bin/console doctrine:database:create --env=test --if-not-exists || true
           php bin/console doctrine:schema:create --env=test || true
 
+      # --- Tests ---
       - name: Run tests
         env:
           DATABASE_URL: "mysql://root:root@127.0.0.1:3306/icon_dahomey_test?serverVersion=8.0.32&charset=utf8mb4"
