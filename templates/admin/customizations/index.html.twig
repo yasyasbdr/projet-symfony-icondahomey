@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+{% block title %}Personnalisations — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'customizations'} %}
+    <div class="admin-main">
+        {% for label, messages in app.flashes %}{% for message in messages %}
+            <div class="flash {{ label }}" style="margin-bottom:16px">{{ message }}</div>
+        {% endfor %}{% endfor %}
+
+        <h1>Demandes de personnalisation</h1>
+        <p class="muted">Fixez un prix pour les demandes en attente. Le client pourra ensuite accepter ou refuser.</p>
+
+        <div class="admin-card" style="margin-top:24px">
+            <table class="table">
+                <thead><tr><th>Client</th><th>Produit</th><th>Demande</th><th>Statut</th><th>Prix</th><th>Action</th></tr></thead>
+                <tbody>
+                {% for cr in requests %}
+                    <tr>
+                        <td><strong>{{ cr.customer.fullName }}</strong></td>
+                        <td>{{ cr.product.name }}</td>
+                        <td class="muted" style="max-width:260px">{{ cr.description }}</td>
+                        <td>
+                            {% set cls = {'pending':'pending','priced':'in_progress','accepted':'shipped','refused':'cancelled'} %}
+                            <span class="status-badge {{ cls[cr.status.value] }}">{{ cr.status.label }}</span>
+                        </td>
+                        <td>{{ cr.proposedPrice ? cr.proposedPrice ~ ' €' : '—' }}</td>
+                        <td>
+                            {% if cr.status.value == 'pending' %}
+                                <form method="post" action="{{ path('admin_customization_price', {id: cr.id}) }}" style="display:flex;gap:6px">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('customization_price' ~ cr.id) }}">
+                                    <input type="text" name="proposed_price" placeholder="Prix €" class="input" style="width:90px;padding:6px 8px" required>
+                                    <button class="btn btn-sm" type="submit">Proposer</button>
+                                </form>
+                            {% else %}
+                                <span class="muted" style="font-size:12px">
+                                    {{ cr.decidedAt ? 'Décidé le ' ~ cr.decidedAt|date('d/m/Y') : 'En attente client' }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="muted">Aucune demande.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,10 +2,14 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Conversation;
+use App\Entity\Message;
 use App\Entity\Order;
 use App\Entity\OrderStatusHistory;
+use App\Entity\User;
 use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
+use App\Service\SmsSender;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,6 +73,51 @@ class AdminOrderController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Commande mise a jour.');
+
+        return $this->redirectToRoute('admin_order_show', ['id' => $order->getId()]);
+    }
+
+    /**
+     * Réponse de l'administration au client, dans le fil de discussion lié à sa commande.
+     * Réutilise (ou crée) la conversation du client.
+     */
+    #[Route('/{id}/message', name: 'admin_order_message', methods: ['POST'])]
+    public function message(Order $order, Request $request, EntityManagerInterface $em, SmsSender $sms): Response
+    {
+        if (!$this->isCsrfTokenValid('admin_message'.$order->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $content = trim((string) $request->request->get('message'));
+        if ($content === '') {
+            return $this->redirectToRoute('admin_order_show', ['id' => $order->getId()]);
+        }
+
+        $client = $order->getCustomer();
+        $conversation = $client?->getConversations()->first() ?: null;
+        if (!$conversation instanceof Conversation) {
+            $conversation = (new Conversation())
+                ->setClient($client)
+                ->setSubject('À propos de la commande '.$order->getReference());
+            $em->persist($conversation);
+        }
+
+        /** @var User $admin */
+        $admin = $this->getUser();
+        $message = (new Message())
+            ->setConversation($conversation)
+            ->setSender($admin)
+            ->setContent($content);
+        $conversation->addMessage($message);
+        $em->persist($message);
+        $em->flush();
+
+        // Notification SMS au client (API externe HttpClient).
+        if ($client?->getPhone()) {
+            $sms->send($client->getPhone(), 'Icon Dahomey : vous avez reçu un nouveau message concernant votre commande.');
+        }
+
+        $this->addFlash('success', 'Message envoyé au client.');
 
         return $this->redirectToRoute('admin_order_show', ['id' => $order->getId()]);
     }

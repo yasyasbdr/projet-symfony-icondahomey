@@ -9,7 +9,7 @@
     <nav class="account-nav">
         <a href="{{ path('app_order_index') }}" class="{{ active == 'orders' ? 'active' }}">&#128230; Mes commandes</a>
         <a href="{{ path('app_favorites') }}" class="{{ active == 'favorites' ? 'active' }}">&#9825; Mes favoris</a>
-        <a href="#" class="{{ active == 'messaging' ? 'active' }}">&#9993; Messagerie</a>
-        <a href="{{ path('app_logout') }}">&#8617; Deconnexion</a>
+        <a href="{{ path('app_customization_index') }}" class="{{ active == 'customizations' ? 'active' }}">&#9998; Mes personnalisations</a>
+        <a href="{{ path('app_logout') }}">&#8617; Déconnexion</a>
     </nav>
 </aside>

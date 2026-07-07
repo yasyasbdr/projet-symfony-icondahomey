@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    name: Lint & Tests
+    name: Lint, Analyse & Tests
     runs-on: ubuntu-latest
 
     services:
@@ -47,6 +47,10 @@ jobs:
 
       - name: Lint container (services)
         run: php bin/console lint:container
+
+      # --- Analyse statique ---
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
 
       # --- Base de test ---
       - name: Prepare test database

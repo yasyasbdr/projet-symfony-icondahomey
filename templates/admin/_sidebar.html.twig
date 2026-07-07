@@ -3,7 +3,7 @@
     <nav class="admin-nav" style="margin-top:20px">
         <a href="{{ path('admin_dashboard') }}" class="{{ active == 'dashboard' ? 'active' }}">&#9632; Tableau de bord</a>
         <a href="{{ path('admin_order_index') }}" class="{{ active == 'orders' ? 'active' }}">&#128230; Commandes</a>
-        <a href="#" class="{{ active == 'messages' ? 'active' }}">&#9993; Messages</a>
+        <a href="{{ path('admin_customization_index') }}" class="{{ active == 'customizations' ? 'active' }}">&#9998; Personnalisations</a>
         {% if is_granted('ROLE_SUPER_ADMIN') %}
             <a href="{{ path('admin_product_index') }}" class="{{ active == 'products' ? 'active' }}">&#9733; Produits</a>
             <a href="{{ path('admin_user_index') }}" class="{{ active == 'clients' ? 'active' }}">&#9787; Clients</a>

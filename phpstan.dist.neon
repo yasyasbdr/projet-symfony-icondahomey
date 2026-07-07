@@ -1,0 +1,9 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+    # Réduit les faux positifs sur les types déjà garantis.
+    treatPhpDocTypesAsCertain: false

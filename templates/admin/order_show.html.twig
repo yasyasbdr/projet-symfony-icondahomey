@@ -100,6 +100,30 @@
                         <p class="muted">Aucun changement enregistre.</p>
                     {% endfor %}
                 </div>
+
+                <div class="admin-card">
+                    <h2>Messagerie client</h2>
+                    {% set conv = order.customer.conversations|first %}
+                    <div class="chat">
+                        <div class="chat-log" style="max-height:260px">
+                            {% if conv %}
+                                {% for m in conv.messages %}
+                                    <div class="bubble {{ m.sender == app.user or m.sender.email != order.customer.email ? 'me' : 'them' }}">
+                                        {{ m.content }}
+                                        <span class="t">{{ m.sender.firstName }} &middot; {{ m.createdAt|date('d/m H:i') }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="muted center">Aucun message pour l'instant.</p>
+                            {% endif %}
+                        </div>
+                        <form class="chat-form" method="post" action="{{ path('admin_order_message', {id: order.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin_message' ~ order.id) }}">
+                            <input type="text" name="message" placeholder="Répondre au client..." required>
+                            <button class="btn btn-sm" type="submit">Envoyer</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

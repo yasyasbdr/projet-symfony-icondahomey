@@ -64,6 +64,20 @@
             </div>
         {{ form_end(form) }}
 
+        {% if product.isCustomizable and app.user %}
+            <div style="margin-top:24px;padding:20px;border:1px dashed var(--line-strong);border-radius:12px">
+                <div class="block-label" style="margin-top:0">Demander un devis sur mesure</div>
+                <p class="muted" style="font-size:13px;margin-bottom:12px">Décrivez la personnalisation souhaitée : nous vous proposerons un prix.</p>
+                <form method="post" action="{{ path('app_customization_request', {slug: product.slug}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('customization_request' ~ product.id) }}">
+                    <div class="field" style="margin-bottom:12px">
+                        <textarea class="input" name="description" rows="3" placeholder="Ex : cette création en coton écru, anse plus longue..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline btn-sm">Demander un devis</button>
+                </form>
+            </div>
+        {% endif %}
+
         <div class="accordion">
             <details open>
                 <summary>Description <span>+</span></summary>

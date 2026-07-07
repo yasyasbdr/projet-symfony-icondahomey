@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mes personnalisations — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container account">
+    {% include 'account/_sidebar.html.twig' with {active: 'customizations'} %}
+    <section>
+        <div class="panel-head"><h1>Mes personnalisations</h1><p class="muted">Vos demandes de devis sur mesure.</p></div>
+
+        {% for cr in requests %}
+            <div class="panel" style="margin-bottom:18px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div>
+                        <strong>{{ cr.product.name }}</strong>
+                        <p class="muted" style="margin:6px 0">{{ cr.description }}</p>
+                        <small class="muted">Demandé le {{ cr.requestedAt|date('d/m/Y') }}</small>
+                    </div>
+                    <div style="text-align:right">
+                        {% set cls = {'pending':'pending','priced':'in_progress','accepted':'shipped','refused':'cancelled'} %}
+                        <span class="status-badge {{ cls[cr.status.value] }}">{{ cr.status.label }}</span>
+                        {% if cr.proposedPrice %}<div class="price" style="margin-top:8px">{{ cr.proposedPrice }} €</div>{% endif %}
+                    </div>
+                </div>
+
+                {% if cr.status.value == 'priced' %}
+                    <div style="display:flex;gap:10px;margin-top:16px">
+                        <form method="post" action="{{ path('app_customization_accept', {id: cr.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ cr.id) }}">
+                            <button class="btn btn-sm" type="submit">Accepter le devis</button>
+                        </form>
+                        <form method="post" action="{{ path('app_customization_refuse', {id: cr.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('refuse' ~ cr.id) }}">
+                            <button class="btn btn-sm btn-ghost" type="submit">Refuser</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="panel center">
+                <p class="muted">Aucune demande de personnalisation.</p>
+                <a href="{{ path('app_catalog', {customizable: 1}) }}" class="btn" style="margin-top:16px">Voir les créations personnalisables</a>
+            </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}
