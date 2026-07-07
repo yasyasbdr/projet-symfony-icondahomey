@@ -1,6 +1,7 @@
 parameters:
     app.mailer_from: '%env(MAILER_FROM)%'
     app.stripe_secret_default: ''
+    app.sms_default: ''
 
 services:
     _defaults:
@@ -16,10 +17,10 @@ services:
 
     App\Service\SmsSender:
         arguments:
-            $smsApiUrl: '%env(SMS_API_URL)%'
-            $smsApiToken: '%env(SMS_API_TOKEN)%'
+            $accountSid: '%env(default:app.sms_default:TWILIO_ACCOUNT_SID)%'
+            $authToken: '%env(default:app.sms_default:TWILIO_AUTH_TOKEN)%'
+            $fromNumber: '%env(default:app.sms_default:TWILIO_FROM)%'
 
     App\Service\StripeCheckout:
         arguments:
-            # Si STRIPE_SECRET_KEY n'est pas defini, on retombe sur '' (paiement simule).
             $secretKey: '%env(default:app.stripe_secret_default:STRIPE_SECRET_KEY)%'
