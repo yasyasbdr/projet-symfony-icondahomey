@@ -81,27 +81,6 @@ php bin/phpunit
 - `tests/Unit/CartTest.php` — calcul du total du panier (sans BDD).
 - `tests/Functional/SmokeTest.php` — la page de connexion répond.
 
-## 6. ⚠️ Ce qu'il te reste à faire à la main
-
-Le code est complet et cohérent, mais certains éléments dépendent de TON
-environnement / de comptes externes et ne peuvent pas être pré-remplis :
-
-1. **`composer install`** puis génération de la **migration** (`make:migration`) :
-   à faire chez toi. Ne pas écrire la migration à la main (risque de décalage
-   avec les entités) — laisse Doctrine la générer.
-2. **Secrets** dans `.env.local` : `APP_SECRET`, `DATABASE_URL`, la clé **Stripe**
-   de test (`STRIPE_SECRET_KEY`) et les identifiants de l'**API SMS**
-   (`SMS_API_URL`, `SMS_API_TOKEN`). Sans clé SMS, l'envoi est simplement ignoré (log).
-3. **Intégration paiement Stripe** : le champ `stripePaymentIntentId` et l'entité
-   `Payment` sont prêts, mais le tunnel de paiement réel (SDK Stripe, webhook) est
-   à brancher selon ta clé.
-4. **Images produits** : place tes visuels dans `public/uploads/products/`
-   (les fixtures référencent des noms de fichiers ; à défaut, un placeholder s'affiche).
-5. **Déploiement** (hébergeur, base de prod, `APP_ENV=prod`, `composer install --no-dev`,
-   `cache:clear`) — non couvert ici.
-6. **Compléter** : étoffer les tests, ajouter le CRUD admin produits/clients si demandé,
-   et vérifier chaque fichier pour l'oral (tu dois pouvoir expliquer ton code).
-
 ---
 
 Projet étudiant — Symfony 7 / Doctrine ORM 3.
