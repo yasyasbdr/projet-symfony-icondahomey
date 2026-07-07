@@ -1,86 +1,164 @@
 # Icon Dahomey — Plateforme e-commerce (Symfony 7)
 
-Boutique de créations au crochet : catalogue (créations physiques + patrons PDF),
-panier persisté, commandes avec suivi de fabrication, personnalisation, messagerie
-interne, espace client et back-office d'administration.
+Boutique de créations au crochet : catalogue filtrable (créations physiques + patrons PDF),
+panier persisté, tunnel de commande avec paiement Stripe, suivi de fabrication,
+personnalisation sur mesure (devis), messagerie client/admin, et back-office à
+trois niveaux de rôles.
 
-> **Important** : ce dépôt contient le **code source** du projet, **sans le dossier
-> `vendor/`** (les dépendances). C'est normal : on ne versionne jamais `vendor/`.
-> Suis les étapes ci-dessous pour installer et lancer le projet en local.
+**Démo en ligne :** https://projet-symfony-icondahomey.onrender.com
 
 ---
 
-## 1. Prérequis
+## Sommaire
+1. [Stack technique](#stack-technique)
+2. [Prérequis](#prérequis)
+3. [Installation en local](#installation-en-local)
+4. [Comptes de test](#comptes-de-test)
+5. [Tests & qualité](#tests--qualité)
+6. [Fonctionnalités](#fonctionnalités)
+7. [Points d'architecture](#points-darchitecture)
+8. [Déploiement](#déploiement)
 
-- PHP **8.2+** (avec extensions `pdo_mysql`, `intl`, `mbstring`, `bcmath`)
-- **Composer**
-- **MySQL 8** (ou MariaDB) — ou modifie `DATABASE_URL` pour PostgreSQL/SQLite
-- (recommandé) la **CLI Symfony** : https://symfony.com/download
-- (recommandé) **Mailpit** ou **MailCatcher** pour voir les emails en local
+---
 
-## 2. Installation
+## Stack technique
+
+- **PHP 8.3**, **Symfony 7.1**
+- **Doctrine ORM 3** (MySQL 8 en local, PostgreSQL en production)
+- **Twig** (vues), **Stripe** (paiement), **Symfony Mailer** + **HttpClient**
+- **PHPUnit** (tests), **PHPStan** niveau 5 + linters Symfony (qualité)
+- **Docker** (base de données en local, image de déploiement)
+
+---
+
+## Prérequis
+
+- **PHP 8.2+** avec les extensions : `pdo_mysql`, `intl`, `mbstring`, **`bcmath`**
+- **Composer 2**
+- **Docker** + **Docker Compose** (pour la base de données locale)
+  *(ou une instance MySQL 8 / MariaDB déjà installée)*
+- (optionnel) la **CLI Symfony** : https://symfony.com/download
+
+---
+
+## Installation en local
 
 ```bash
-# 1. Installer les dépendances (génère le dossier vendor/)
+# 1. Cloner le dépôt
+git clone https://github.com/yasyasbdr/projet-symfony-icondahomey.git
+cd projet-symfony-icondahomey
+
+# 2. Installer les dépendances PHP
 composer install
 
-# 3. Créer la base de données
-php bin/console doctrine:database:create
+# 3. Configurer l'environnement local
+cp .env.local.dist .env.local
+#   -> éditer .env.local : renseigner DATABASE_URL et générer un APP_SECRET
+#      (ex : php -r "echo bin2hex(random_bytes(16));")
+#   -> (optionnel) renseigner STRIPE_SECRET_KEY (clé de test) pour activer Stripe.
+#      Sans clé, le paiement passe automatiquement en mode simulé.
 
-# 4. Générer la migration À PARTIR des entités, puis l'exécuter
-php bin/console make:migration
-php bin/console doctrine:migrations:migrate
+# 4. Démarrer la base de données (conteneur MySQL + Adminer)
+docker compose up -d
+#   MySQL est accessible sur 127.0.0.1:3306
+#   Adminer (interface web de la BDD) sur http://localhost:8080
 
-# 5. Charger les données de démonstration (fixtures)
-sudo apt update
-sudo apt install -y php8.3-bcmath
+# 5. Créer la base, exécuter les migrations
+php bin/console doctrine:database:create --if-not-exists
+php bin/console doctrine:migrations:migrate --no-interaction
 
-php bin/console doctrine:fixtures:load
+# 6. Charger les données de démonstration (produits, photos, commandes, comptes)
+php bin/console doctrine:fixtures:load --no-interaction
 
-# 6. Lancer le serveur
+# 7. Lancer le serveur
 symfony serve
-#    ou : php -S localhost:8000 -t public
+#   ou, sans la CLI Symfony :
+#   php -S localhost:8000 -t public
 ```
 
-Le site est alors accessible sur `https://localhost:8000` ou 'http://127.0.0.1:8000/'. 
+Le site est alors accessible sur **https://localhost:8000**.
 
-## 3. Comptes de test (créés par les fixtures)
-
-| Rôle              | Email                          | Mot de passe |
-|-------------------|--------------------------------|--------------|
-| Client            | `cliente@icon-dahomey.local`   | `password`   |
-| Administrateur    | `admin@icon-dahomey.local`     | `password`   |
-| Super-admin       | `super@icon-dahomey.local`     | `password`   |
-
-- Espace client : `/mon-compte/commandes`
-- Back-office : `/admin`
-
-## 4. Architecture (points clés)
-
-- **Héritage** : `Product` est une classe **abstraite** en *Single Table Inheritance*
-  (une seule table `product`, colonne discriminante `product_type`). Sous-types :
-  `PhysicalCreation` et `DigitalPattern`.
-- **`Order`** : `order` étant un mot réservé SQL, la table est nommée `customer_order`
-  (`#[ORM\Table(name: 'customer_order')]`).
-- **Sécurité** : 3 rôles hiérarchisés (`ROLE_CLIENT` < `ROLE_ADMIN` < `ROLE_SUPER_ADMIN`),
-  un `UserChecker` (bannissement) et un **Voter** `OrderVoter` (accès aux commandes).
-- **Panier persisté** en base (`Cart` / `CartItem`), pas en session.
-- **Formulaire dynamique** : `AddToCartType` ajoute les champs de mensurations via
-  les *Form Events* selon le produit.
-- **API JSON** en lecture : `/api/products` et `/api/products/{slug}`.
-- **Mailer** : email de confirmation de commande (`OrderMailer`, routé en asynchrone via Messenger).
-- **API externe** : `SmsSender` consomme une API SMS via `HttpClient`.
-- **Requêtes personnalisées** : `ProductRepository::search()` (filtres + pagination + jointures anti N+1).
-
-## 5. Tests
-
-```bash
-php bin/phpunit
-```
-
-- `tests/Unit/CartTest.php` — calcul du total du panier (sans BDD).
-- `tests/Functional/SmokeTest.php` — la page de connexion répond.
+> **Astuce** : si `bcmath` n'est pas activé, installez-le
+> (`sudo apt install php8.3-bcmath` puis `sudo phpenmod bcmath`). Il est requis
+> pour les calculs monétaires (précision exacte sur les prix).
 
 ---
 
-Projet étudiant — Symfony 7 / Doctrine ORM 3.
+## Comptes de test
+
+Créés automatiquement par les fixtures (mot de passe identique pour tous : `password`) :
+
+| Rôle              | Email                          | Mot de passe | Accès |
+|-------------------|--------------------------------|--------------|-------|
+| **Client**        | `cliente@icon-dahomey.local`   | `password`   | Espace client (`/mon-compte/...`) |
+| **Administrateur**| `admin@icon-dahomey.local`     | `password`   | Back-office (`/admin`) |
+| **Super-admin**   | `super@icon-dahomey.local`     | `password`   | Back-office complet (produits, clients) |
+
+---
+
+## Tests & qualité
+
+```bash
+# Tests unitaires + fonctionnels
+php bin/phpunit
+
+# Analyse statique
+vendor/bin/phpstan analyse
+
+# Linters Symfony
+php bin/console lint:yaml config
+php bin/console lint:twig templates
+php bin/console lint:container
+```
+
+L'ensemble est également exécuté automatiquement via **GitHub Actions**
+(`.github/workflows/ci.yml`) à chaque push : linters -> PHPStan -> tests.
+
+---
+
+## Fonctionnalités
+
+**Front (client)**
+- Catalogue avec recherche et filtres (catégorie, prix, patron PDF, personnalisable, tri) + pagination
+- Fiche produit : galerie, choix du type (création / patron), saisie de mensurations,
+  demande de devis sur mesure
+- Panier persisté en base, tunnel de commande, **paiement Stripe** (ou simulé)
+- Suivi de fabrication (timeline), favoris, messagerie liée à la commande
+- Personnalisation : demande de devis -> prix proposé -> acceptation -> commande à payer
+
+**Back-office (admin / super-admin)**
+- Tableau de bord, gestion des commandes (statut + progression), historique
+- Gestion des demandes de personnalisation (fixation du prix)
+- Messagerie : réponse au client
+- CRUD des produits (super-admin), gestion des comptes (blocage / suppression)
+
+**Technique**
+- API JSON versionnée (`/api/v1/products`) via le Serializer + groupes de normalisation
+- Emails transactionnels (Symfony Mailer), notifications SMS (HttpClient)
+- Pages légales (mentions, CGV, confidentialité, contact)
+
+---
+
+## Points d'architecture
+
+- **Héritage (Single Table Inheritance)** : `Product` est abstraite ; `PhysicalCreation`
+  et `DigitalPattern` partagent une table unique `product` avec une colonne
+  discriminante `product_type`.
+- **Snapshot** : `OrderItem` recopie le nom et le prix au moment de l'achat ->
+  l'historique des commandes reste figé même si le produit change ou est supprimé.
+- **Sécurité** : 3 rôles hiérarchisés, un `UserChecker` (bannissement) et un `OrderVoter`
+  (autorisation fine par objet). Mots de passe hachés.
+- **Table `customer_order`** : `order` étant un mot réservé SQL, la table est renommée.
+- **Requêtes optimisées** : `ProductRepository::search()` (QueryBuilder + jointures
+  anti N+1 + pagination).
+
+Le schéma de la base (MCD / diagramme entités-relations) est disponible dans
+`icon_dahomey_mcd_erd.html`.
+
+---
+
+## Déploiement
+
+Le projet est déployé sur **Render** (Docker + PostgreSQL).
+
+---
