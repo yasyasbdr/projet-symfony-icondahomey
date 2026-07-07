@@ -272,3 +272,12 @@ body.admin{background:#14130F}
 /* Footer 3 colonnes (options compte deplacees dans le header) */
 .footer-grid-3{grid-template-columns:1.6fr 1fr 1fr}
 @media(max-width:900px){.footer-grid-3{grid-template-columns:1fr 1fr}}
+
+/* Pages légales */
+.legal{max-width:820px;margin:0 auto;padding:50px 0 80px}
+.legal h1{font-size:36px;margin-bottom:8px}
+.legal .lead{color:var(--muted);margin-bottom:32px}
+.legal h2{font-size:22px;margin:32px 0 10px}
+.legal p{color:var(--ink-soft);margin-bottom:12px}
+.legal ul{color:var(--ink-soft);margin:0 0 12px 20px}
+.legal li{margin-bottom:6px}

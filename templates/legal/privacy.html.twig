@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% block title %}Politique de confidentialité — Icon Dahomey{% endblock %}
+{% block main %}
+<div class="container"><article class="legal">
+    <h1>Politique de confidentialité</h1>
+    <p class="lead">Conforme au RGPD — {{ "now"|date("d/m/Y") }}</p>
+
+    <h2>Données collectées</h2>
+    <p>Nous collectons les données nécessaires à la gestion de votre compte et de vos commandes : nom, prénom, email, téléphone, adresse de livraison et, le cas échéant, vos mensurations pour les créations sur mesure.</p>
+
+    <h2>Finalités</h2>
+    <ul>
+        <li>Gestion des comptes clients et de l'authentification ;</li>
+        <li>Traitement et suivi des commandes ;</li>
+        <li>Communication (emails et SMS de suivi, réponses du service client) ;</li>
+        <li>Amélioration de nos services.</li>
+    </ul>
+
+    <h2>Conservation</h2>
+    <p>Vos données sont conservées le temps nécessaire à la relation commerciale, puis archivées ou supprimées conformément aux obligations légales.</p>
+
+    <h2>Sécurité</h2>
+    <p>Les mots de passe sont stockés de manière chiffrée (hachage). L'accès aux données est strictement limité au personnel habilité.</p>
+
+    <h2>Vos droits</h2>
+    <p>Vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition sur vos données. Pour l'exercer, contactez-nous via le formulaire de contact.</p>
+
+    <h2>Cookies</h2>
+    <p>Le site utilise uniquement les cookies nécessaires à son fonctionnement (session, authentification).</p>
+</article></div>
+{% endblock %}

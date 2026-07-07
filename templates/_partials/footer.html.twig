@@ -13,9 +13,10 @@
             </div>
             <div>
                 <h5>Aide</h5>
-                <a href="#">Livraison</a>
-                <a href="#">Contact</a>
-                <a href="#">CGV</a>
+                <a href="{{ path('app_contact') }}">Contact</a>
+                <a href="{{ path('app_legal_cgv') }}">CGV</a>
+                <a href="{{ path('app_legal_mentions') }}">Mentions légales</a>
+                <a href="{{ path('app_legal_privacy') }}">Confidentialité</a>
             </div>
         </div>
         <div class="footer-bottom">&copy; {{ "now"|date("Y") }} Icon Dahomey. Tous droits réservés.</div>

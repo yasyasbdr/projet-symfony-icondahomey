@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+{% block title %}Contact — Icon Dahomey{% endblock %}
+{% block main %}
+<div class="container"><article class="legal">
+    <h1>Service client</h1>
+    <p class="lead">Une question sur une création, une commande ou une personnalisation ? Écrivez-nous.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start">
+        <form method="post" action="{{ path('app_contact') }}" class="panel">
+            <input type="hidden" name="_token" value="{{ csrf_token('contact') }}">
+            <div class="field" style="margin-bottom:14px">
+                <label>Nom</label>
+                <input class="input" type="text" name="name" required>
+            </div>
+            <div class="field" style="margin-bottom:14px">
+                <label>Email</label>
+                <input class="input" type="email" name="email" required>
+            </div>
+            <div class="field" style="margin-bottom:16px">
+                <label>Message</label>
+                <textarea class="input" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-block">Envoyer</button>
+        </form>
+
+        <div class="info-box">
+            <h4>Coordonnées</h4>
+            <p class="muted" style="margin-top:8px">Icon Dahomey<br>12 rue des Artisans<br>75011 Paris, France</p>
+            <p class="muted" style="margin-top:12px">contact@icon-dahomey.fr</p>
+            <p class="muted" style="margin-top:12px">Vous avez un compte ? Utilisez la messagerie de votre espace client pour un suivi personnalisé de vos commandes.</p>
+        </div>
+    </div>
+</article></div>
+{% endblock %}
