@@ -16,7 +16,7 @@
                             <small>{{ item.selectedType.label }} &middot; {{ item.product.basePrice }} € / unité</small>
                             <form method="post" action="{{ path('app_cart_update', {id: item.id}) }}" style="display:flex;gap:8px;align-items:center;margin-top:8px">
                                 <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="input" style="width:72px;padding:6px 8px">
-                                <button class="btn btn-sm btn-outline" type="submit">Maj</button>
+                                <button class="btn btn-sm btn-outline" type="submit">Valider nombre</button>
                             </form>
                         </div>
                         <div style="text-align:right">

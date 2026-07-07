@@ -52,6 +52,9 @@ Mets-le sous cette forme (scheme `postgresql` + version + charset) :
 postgresql://user:pass@host:5432/db?serverVersion=16&charset=utf8
 
 postgresql://icon_dahomey_db_user:TCzDCWElVdIEYgPMJ8MhuGQAxjSkwSis@dpg-d96mq69o3t8c738oci4g-a:5432/icon_dahomey_db?serverVersion=16&charset=utf8
+
+postgresql://icon_dahomey_db_user:TCzDCWElVdIEYgPMJ8MhuGQAxjSkwSis@dpg-d96mq69o3t8c738oci4g-a:5432/icon_dahomey_db?serverVersion=16&charset=utf8
+
 ```
 
 Enregistre → Render relance un déploiement.
