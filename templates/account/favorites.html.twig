@@ -5,7 +5,7 @@
 <div class="container account">
     {% include 'account/_sidebar.html.twig' with {active: 'favorites'} %}
     <section>
-        <div class="panel-head"><h1>Mes favoris</h1><p class="muted">Les creations que vous avez aimees.</p></div>
+        <div class="panel-head"><h1>Mes favoris</h1><p class="muted">Les creations que vous avez aimées.</p></div>
         <div class="grid grid-3">
             {% for product in favorites %}
                 {% include '_partials/product_card.html.twig' %}
