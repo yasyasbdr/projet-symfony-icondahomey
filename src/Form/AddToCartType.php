@@ -41,14 +41,6 @@ class AddToCartType extends AbstractType
                 'attr' => ['min' => 1],
             ]);
 
-        if ($product->isCustomizable()) {
-            $builder->add('customizationNote', TextareaType::class, [
-                'label' => 'Demande de personnalisation',
-                'required' => false,
-                'mapped' => true,
-            ]);
-        }
-
         // Ajout dynamique des champs de mensurations en fonction du produit.
         $needsMeasurements = $product instanceof PhysicalCreation && $product->requiresMeasurements();
 

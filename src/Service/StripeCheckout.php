@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Cart;
+use App\Entity\Order;
 
 /**
  * Intégration du paiement Stripe (Checkout Session hébergée).
@@ -39,6 +40,38 @@ class StripeCheckout
                     'currency' => 'eur',
                     'product_data' => ['name' => (string) $product?->getName()],
                     'unit_amount' => (int) round(((float) $product?->getBasePrice()) * 100),
+                ],
+                'quantity' => $item->getQuantity(),
+            ];
+        }
+
+        $session = \Stripe\Checkout\Session::create([
+            'mode' => 'payment',
+            'line_items' => $lineItems,
+            'customer_email' => $customerEmail,
+            'success_url' => $successUrl.'?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => $cancelUrl,
+        ]);
+
+        return $session->url;
+    }
+
+    /** Crée une session Stripe pour payer une commande existante ("à payer"). */
+    public function createSessionUrlForOrder(Order $order, string $successUrl, string $cancelUrl, string $customerEmail): ?string
+    {
+        if (!$this->isConfigured()) {
+            return null;
+        }
+
+        \Stripe\Stripe::setApiKey($this->secretKey);
+
+        $lineItems = [];
+        foreach ($order->getItems() as $item) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => ['name' => (string) $item->getProductName()],
+                    'unit_amount' => (int) round(((float) $item->getUnitPrice()) * 100),
                 ],
                 'quantity' => $item->getQuantity(),
             ];

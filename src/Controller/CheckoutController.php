@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Order;
 use App\Entity\User;
 use App\Service\CartManager;
 use App\Service\OrderFactory;
@@ -105,6 +106,77 @@ class CheckoutController extends AbstractController
         $this->addFlash('info', 'Paiement annulé, votre panier est conservé.');
 
         return $this->redirectToRoute('app_cart');
+    }
+
+    /**
+     * Paiement d'une commande existante "à payer" (issue d'un devis de
+     * personnalisation accepté). Réutilise le même mécanisme Stripe/simulé.
+     */
+    #[Route('/commande/{id}', name: 'app_checkout_pay_order', methods: ['GET', 'POST'])]
+    public function payOrder(
+        Order $order,
+        Request $request,
+        StripeCheckout $stripe,
+        OrderFactory $orderFactory,
+        OrderMailer $mailer,
+    ): Response {
+        $this->assertPayable($order);
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('pay_order'.$order->getId(), (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException();
+            }
+
+            $successUrl = $this->generateUrl('app_checkout_order_success', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $cancelUrl = $this->generateUrl('app_order_show', ['id' => $order->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $stripeUrl = $stripe->createSessionUrlForOrder($order, $successUrl, $cancelUrl, (string) $order->getCustomer()?->getEmail());
+
+            if ($stripeUrl !== null) {
+                return $this->redirect($stripeUrl);
+            }
+
+            $orderFactory->markOrderPaid($order, 'Carte bancaire (simulé)');
+            $this->safeSendEmail($mailer, $order);
+            $this->addFlash('success', 'Paiement accepté, votre commande personnalisée est confirmée !');
+
+            return $this->redirectToRoute('app_order_show', ['id' => $order->getId()]);
+        }
+
+        return $this->render('checkout/pay_order.html.twig', [
+            'order' => $order,
+            'stripe_enabled' => $stripe->isConfigured(),
+        ]);
+    }
+
+    #[Route('/commande/{id}/succes', name: 'app_checkout_order_success', methods: ['GET'])]
+    public function payOrderSuccess(
+        Order $order,
+        Request $request,
+        StripeCheckout $stripe,
+        OrderFactory $orderFactory,
+        OrderMailer $mailer,
+    ): Response {
+        $this->assertPayable($order);
+
+        $sessionId = $request->query->get('session_id');
+        $intentId = $sessionId ? $stripe->retrievePaymentIntentId($sessionId) : null;
+
+        $orderFactory->markOrderPaid($order, 'Stripe', $intentId);
+        $this->safeSendEmail($mailer, $order);
+        $this->addFlash('success', 'Paiement Stripe validé, merci !');
+
+        return $this->redirectToRoute('app_order_show', ['id' => $order->getId()]);
+    }
+
+    /** Vérifie que la commande appartient au client et n'est pas déjà payée. */
+    private function assertPayable(Order $order): void
+    {
+        if ($order->getCustomer() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($order->getPayment() !== null) {
+            throw $this->createAccessDeniedException('Cette commande est déjà payée.');
+        }
     }
 
     /** L'envoi d'email ne doit jamais casser le tunnel de commande. */

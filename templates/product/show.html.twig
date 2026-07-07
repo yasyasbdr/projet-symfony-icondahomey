@@ -43,18 +43,6 @@
                 </div>
             {% endif %}
 
-            {% if form.customizationNote is defined %}
-                <div class="block-label" style="display:flex;justify-content:space-between;align-items:center">
-                    <span>Demander une personnalisation</span>
-                    <label style="text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer">
-                        <input type="checkbox" id="cust-toggle"> Oui
-                    </label>
-                </div>
-                <div id="cust-block" style="display:none">
-                    <div class="field">{{ form_widget(form.customizationNote, {attr: {placeholder: 'Couleur, taille, details souhaites...', rows: 3}}) }}</div>
-                </div>
-            {% endif %}
-
             <div class="qty-add">
                 <div class="field">
                     <label>Qte</label>
@@ -66,15 +54,22 @@
 
         {% if product.isCustomizable and app.user %}
             <div style="margin-top:24px;padding:20px;border:1px dashed var(--line-strong);border-radius:12px">
-                <div class="block-label" style="margin-top:0">Demander un devis sur mesure</div>
-                <p class="muted" style="font-size:13px;margin-bottom:12px">Décrivez la personnalisation souhaitée : nous vous proposerons un prix.</p>
-                <form method="post" action="{{ path('app_customization_request', {slug: product.slug}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('customization_request' ~ product.id) }}">
-                    <div class="field" style="margin-bottom:12px">
-                        <textarea class="input" name="description" rows="3" placeholder="Ex : cette création en coton écru, anse plus longue..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-outline btn-sm">Demander un devis</button>
-                </form>
+                <div class="block-label" style="margin-top:0;display:flex;justify-content:space-between;align-items:center">
+                    <span>Demander un devis sur mesure</span>
+                    <label style="text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer">
+                        <input type="checkbox" id="devis-toggle"> Oui
+                    </label>
+                </div>
+                <div id="devis-block" style="display:none">
+                    <p class="muted" style="font-size:13px;margin:8px 0 12px">Décrivez la personnalisation souhaitée : nous vous proposerons un prix.</p>
+                    <form method="post" action="{{ path('app_customization_request', {slug: product.slug}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('customization_request' ~ product.id) }}">
+                        <div class="field" style="margin-bottom:12px">
+                            <textarea class="input" name="description" rows="3" placeholder="Ex : cette création en coton écru, anse plus longue..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-outline btn-sm">Envoyer ma demande</button>
+                    </form>
+                </div>
             </div>
         {% endif %}
 
@@ -117,11 +112,12 @@
     syncMeasures();
 
     // Personnalisation : la zone de texte n'apparait que si l'interrupteur est active.
-    var custToggle = document.getElementById('cust-toggle');
-    var custBlock = document.getElementById('cust-block');
-    if (custToggle && custBlock) {
-        custToggle.addEventListener('change', function () {
-            custBlock.style.display = custToggle.checked ? '' : 'none';
+    // Devis sur mesure : le formulaire n'apparaît que si l'interrupteur est activé.
+    var devisToggle = document.getElementById('devis-toggle');
+    var devisBlock = document.getElementById('devis-block');
+    if (devisToggle && devisBlock) {
+        devisToggle.addEventListener('change', function () {
+            devisBlock.style.display = devisToggle.checked ? '' : 'none';
         });
     }
 })();

@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Enum\CustomizationStatus;
 use App\Repository\CustomizationRequestRepository;
 use App\Repository\ProductRepository;
+use App\Service\OrderFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,13 +60,18 @@ class CustomizationController extends AbstractController
     }
 
     #[Route('/mon-compte/personnalisations/{id}/accepter', name: 'app_customization_accept', methods: ['POST'])]
-    public function accept(CustomizationRequest $cr, Request $request, EntityManagerInterface $em): Response
+    public function accept(CustomizationRequest $cr, Request $request, EntityManagerInterface $em, OrderFactory $orderFactory): Response
     {
         $this->decide($cr, $request, CustomizationStatus::Accepted, 'accept');
-        $em->flush();
-        $this->addFlash('success', 'Devis accepté ! Nous démarrons la fabrication.');
 
-        return $this->redirectToRoute('app_customization_index');
+        // Le devis accepté devient une commande "à payer", gérable comme les autres.
+        $order = $orderFactory->createPendingOrderFromCustomization($cr);
+        $cr->setOrderItem($order->getItems()->first() ?: null);
+        $em->flush();
+
+        $this->addFlash('success', 'Devis accepté ! Finalisez le paiement pour lancer la fabrication.');
+
+        return $this->redirectToRoute('app_checkout_pay_order', ['id' => $order->getId()]);
     }
 
     #[Route('/mon-compte/personnalisations/{id}/refuser', name: 'app_customization_refuse', methods: ['POST'])]

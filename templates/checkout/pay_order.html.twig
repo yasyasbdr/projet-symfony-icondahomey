@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+{% block title %}Paiement de commande — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container" style="padding:40px 0 72px;max-width:720px">
+    <h1 style="font-size:32px;margin-bottom:6px">Finaliser votre commande</h1>
+    <p class="muted" style="margin-bottom:24px">Commande {{ order.reference }} — création personnalisée.</p>
+
+    <div class="panel" style="margin-bottom:20px">
+        {% for item in order.items %}
+            <div class="order-line">
+                <div class="thumb" style="{% if item.product and item.product.mainImage %}background-image:url('{{ asset('uploads/' ~ item.product.mainImage.filename) }}');background-size:cover;background-position:center{% endif %}"></div>
+                <div class="meta">
+                    <div class="nm">{{ item.productName }}</div>
+                    <small>Qté {{ item.quantity }}</small>
+                </div>
+                <div class="price">{{ item.lineTotal }} €</div>
+            </div>
+        {% endfor %}
+        <div style="text-align:right;margin-top:16px;font-family:var(--font-display);font-size:22px;font-weight:600">Total : {{ order.totalAmount }} €</div>
+    </div>
+
+    <div class="panel">
+        <h2 style="font-size:18px;margin-bottom:12px">Paiement</h2>
+        {% if stripe_enabled %}
+            <p class="muted" style="margin-bottom:16px">Vous allez être redirigé vers le paiement sécurisé Stripe.</p>
+        {% else %}
+            <p class="muted" style="margin-bottom:16px">Mode démonstration : paiement simulé.</p>
+        {% endif %}
+        <form method="post" action="{{ path('app_checkout_pay_order', {id: order.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('pay_order' ~ order.id) }}">
+            <button type="submit" class="btn btn-block">
+                {{ stripe_enabled ? 'Payer avec Stripe' : 'Payer ' ~ order.totalAmount ~ ' € (simulé)' }}
+            </button>
+        </form>
+        <a href="{{ path('app_order_index') }}" class="btn btn-block btn-outline" style="margin-top:10px">Payer plus tard</a>
+    </div>
+</div>
+{% endblock %}
