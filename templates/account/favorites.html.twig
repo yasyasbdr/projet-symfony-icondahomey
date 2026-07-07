@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mes favoris — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container account">
+    {% include 'account/_sidebar.html.twig' with {active: 'favorites'} %}
+    <section>
+        <div class="panel-head"><h1>Mes favoris</h1><p class="muted">Les creations que vous avez aimees.</p></div>
+        <div class="grid grid-3">
+            {% for product in favorites %}
+                {% include '_partials/product_card.html.twig' %}
+            {% else %}
+                <div class="panel" style="grid-column:1/-1;text-align:center">
+                    <p class="muted">Vous n'avez pas encore de favori.</p>
+                    <a href="{{ path('app_catalog') }}" class="btn" style="margin-top:16px">Parcourir la boutique</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

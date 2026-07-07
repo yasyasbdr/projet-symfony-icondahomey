@@ -1,0 +1,25 @@
+parameters:
+    app.mailer_from: '%env(MAILER_FROM)%'
+    app.stripe_secret_default: ''
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\SmsSender:
+        arguments:
+            $smsApiUrl: '%env(SMS_API_URL)%'
+            $smsApiToken: '%env(SMS_API_TOKEN)%'
+
+    App\Service\StripeCheckout:
+        arguments:
+            # Si STRIPE_SECRET_KEY n'est pas defini, on retombe sur '' (paiement simule).
+            $secretKey: '%env(default:app.stripe_secret_default:STRIPE_SECRET_KEY)%'

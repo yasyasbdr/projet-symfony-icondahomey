@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+{% block title %}Tableau de bord — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'dashboard'} %}
+    <div class="admin-main">
+        <h1>Tableau de bord</h1>
+        <p class="muted">Vue d'ensemble de l'activite.</p>
+
+        <div class="stat-grid">
+            <div class="stat"><div class="n">{{ stats.orders_pending }}</div><div class="l">A valider</div></div>
+            <div class="stat"><div class="n">{{ stats.orders_in_progress }}</div><div class="l">En cours</div></div>
+            <div class="stat"><div class="n">{{ stats.products }}</div><div class="l">Produits</div></div>
+            <div class="stat"><div class="n">{{ stats.clients }}</div><div class="l">Clients</div></div>
+        </div>
+
+        <div class="admin-card">
+            <h2>Commandes a traiter</h2>
+            <table class="table">
+                <thead><tr><th>Reference</th><th>Client</th><th>Montant</th><th>Date</th><th></th></tr></thead>
+                <tbody>
+                {% for order in pendingOrders %}
+                    <tr>
+                        <td><strong>{{ order.reference }}</strong></td>
+                        <td>{{ order.customer.fullName }}</td>
+                        <td>{{ order.totalAmount }} &euro;</td>
+                        <td>{{ order.createdAt|date('d/m/Y') }}</td>
+                        <td><a href="{{ path('admin_order_show', {id: order.id}) }}" class="btn btn-sm btn-outline">Traiter</a></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5" class="muted">Aucune commande en attente.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-card">
+            <h2>Demandes de personnalisation</h2>
+            <table class="table">
+                <thead><tr><th>Client</th><th>Produit</th><th>Demande</th><th>Statut</th></tr></thead>
+                <tbody>
+                {% for cr in pendingCustomizations %}
+                    <tr>
+                        <td>{{ cr.customer.fullName }}</td>
+                        <td>{{ cr.product.name }}</td>
+                        <td class="muted">{{ cr.description|slice(0,60) }}...</td>
+                        <td><span class="status-badge pending">{{ cr.status.label }}</span></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4" class="muted">Aucune demande en attente.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+{% block title %}Produits — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'products'} %}
+    <div class="admin-main">
+        {% for label, messages in app.flashes %}{% for message in messages %}
+            <div class="flash {{ label }}" style="margin-bottom:16px">{{ message }}</div>
+        {% endfor %}{% endfor %}
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <h1>Produits</h1>
+            <div style="display:flex;gap:10px">
+                <a href="{{ path('admin_product_new', {type: 'physical'}) }}" class="btn btn-sm">+ Création physique</a>
+                <a href="{{ path('admin_product_new', {type: 'pattern'}) }}" class="btn btn-sm btn-outline">+ Patron PDF</a>
+            </div>
+        </div>
+
+        <div class="admin-card" style="margin-top:24px">
+            <table class="table">
+                <thead><tr><th>Nom</th><th>Type</th><th>Catégorie</th><th>Prix</th><th>Statut</th><th></th></tr></thead>
+                <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td>{{ product.type == 'pattern' ? 'Patron PDF' : 'Création physique' }}</td>
+                        <td>{{ product.category ? product.category.name : '-' }}</td>
+                        <td>{{ product.basePrice }} €</td>
+                        <td>
+                            {% if product.isPublished %}
+                                <span class="status-badge shipped">Publié</span>
+                            {% else %}
+                                <span class="status-badge">Brouillon</span>
+                            {% endif %}
+                        </td>
+                        <td style="display:flex;gap:8px;justify-content:flex-end">
+                            <a href="{{ path('admin_product_edit', {id: product.id}) }}" class="btn btn-sm btn-outline">Éditer</a>
+                            <form method="post" action="{{ path('admin_product_delete', {id: product.id}) }}" onsubmit="return confirm('Supprimer ce produit ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_product' ~ product.id) }}">
+                                <button class="btn btn-sm btn-ghost" type="submit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="muted">Aucun produit.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ product.name }} — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container pd">
+    <div class="pd-gallery">
+        <div class="main-img">
+            <span class="monogram">Icon</span>
+            {% if product.mainImage %}
+                <img src="{{ asset('uploads/' ~ product.mainImage.filename) }}" alt="{{ product.name }}" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            {% endif %}
+        </div>
+        <div class="thumbs">
+            {% for image in product.images %}
+                <div style="background-image:url('{{ asset('uploads/' ~ image.filename) }}');background-size:cover;background-position:center"></div>
+            {% else %}<div></div><div></div><div></div>{% endfor %}
+        </div>
+    </div>
+
+    <div class="pd-info">
+        <div class="breadcrumb">Accueil / Boutique / {{ product.category ? product.category.name : 'Creation' }}</div>
+        <h1>{{ product.name }}</h1>
+        <div class="pd-price">{{ product.basePrice }} &euro;</div>
+        <p class="muted">{{ product.description|slice(0, 160) }}{% if product.description|length > 160 %}...{% endif %}</p>
+
+        {{ form_start(form) }}
+            <div class="block-label">Type de produit</div>
+            <div class="toggle-group">
+                {% for child in form.selectedType %}
+                    <label>{{ form_widget(child) }}<span>{{ child.vars.label }}</span></label>
+                {% endfor %}
+            </div>
+
+            {% if form.m_poitrine is defined %}
+                <div id="measure-block">
+                    <div class="block-label">Mensurations (cm)</div>
+                    <div class="measure-grid">
+                        <div class="field">{{ form_label(form.m_poitrine) }}{{ form_widget(form.m_poitrine) }}</div>
+                        <div class="field">{{ form_label(form.m_taille) }}{{ form_widget(form.m_taille) }}</div>
+                        <div class="field">{{ form_label(form.m_hanches) }}{{ form_widget(form.m_hanches) }}</div>
+                        <div class="field">{{ form_label(form.m_hauteur) }}{{ form_widget(form.m_hauteur) }}</div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if form.customizationNote is defined %}
+                <div class="block-label" style="display:flex;justify-content:space-between;align-items:center">
+                    <span>Demander une personnalisation</span>
+                    <label style="text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer">
+                        <input type="checkbox" id="cust-toggle"> Oui
+                    </label>
+                </div>
+                <div id="cust-block" style="display:none">
+                    <div class="field">{{ form_widget(form.customizationNote, {attr: {placeholder: 'Couleur, taille, details souhaites...', rows: 3}}) }}</div>
+                </div>
+            {% endif %}
+
+            <div class="qty-add">
+                <div class="field">
+                    <label>Qte</label>
+                    {{ form_widget(form.quantity) }}
+                </div>
+                <button type="submit" class="btn btn-block" style="align-self:flex-end">Ajouter au panier</button>
+            </div>
+        {{ form_end(form) }}
+
+        <div class="accordion">
+            <details open>
+                <summary>Description <span>+</span></summary>
+                <p>{{ product.description|nl2br }}</p>
+            </details>
+            <details>
+                <summary>Livraison &amp; retours <span>+</span></summary>
+                <p class="muted">Chaque piece est crochetee a la main : comptez 2 a 3 semaines de realisation pour les creations sur-mesure. Livraison suivie en France et a l'international.</p>
+            </details>
+            {% if product.tags|length %}
+            <details>
+                <summary>Details <span>+</span></summary>
+                <p class="muted">Tags : {% for t in product.tags %}{{ t.name }}{{ not loop.last ? ', ' }}{% endfor %}</p>
+            </details>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function () {
+    var form = document.querySelector('.pd-info form');
+    if (!form) return;
+
+    // Mensurations : visibles uniquement quand "Creation physique" est selectionne.
+    var measures = document.getElementById('measure-block');
+    var typeRadios = form.querySelectorAll('input[name$="[selectedType]"]');
+
+    function syncMeasures() {
+        if (!measures) return;
+        var checked = form.querySelector('input[name$="[selectedType]"]:checked');
+        measures.style.display = (checked && checked.value === 'physical') ? '' : 'none';
+    }
+    typeRadios.forEach(function (r) { r.addEventListener('change', syncMeasures); });
+    syncMeasures();
+
+    // Personnalisation : la zone de texte n'apparait que si l'interrupteur est active.
+    var custToggle = document.getElementById('cust-toggle');
+    var custBlock = document.getElementById('cust-block');
+    if (custToggle && custBlock) {
+        custToggle.addEventListener('change', function () {
+            custBlock.style.display = custToggle.checked ? '' : 'none';
+        });
+    }
+})();
+</script>
+{% endblock %}

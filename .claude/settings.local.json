@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f /tmp/claude-1000/-home-yasminebdr-ESGI-symfony-icon-dahomey-icon-dahomey/212780e9-81ec-419a-93e1-69b8696f3d0b/scratchpad/test_pa.php)",
+      "Bash(php /tmp/claude-1000/-home-yasminebdr-ESGI-symfony-icon-dahomey-icon-dahomey/212780e9-81ec-419a-93e1-69b8696f3d0b/scratchpad/test_pa.php)",
+      "Bash(php bin/console doctrine:migrations:status)",
+      "Bash(php bin/console dbal:run-sql \"SELECT id, email, roles FROM user LIMIT 5\")",
+      "Bash(php bin/console dbal:run-sql \"SELECT id, name FROM category LIMIT 5\")"
+    ]
+  }
+}

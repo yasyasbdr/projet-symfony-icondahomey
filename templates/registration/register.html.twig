@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %}Inscription — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="auth-wrap">
+        <h1>Créer un compte</h1>
+        <p class="sub">Rejoignez la communaute Icon Dahomey.</p>
+
+        {{ form_start(form) }}
+            {% if not form.vars.valid %}
+                <div class="flash error" style="margin-bottom:18px">
+                    Le formulaire contient des erreurs, merci de verifier les champs.
+                </div>
+            {% endif %}
+
+            <div class="field">{{ form_label(form.firstName) }}{{ form_widget(form.firstName, {attr:{class:'input'}}) }}{{ form_errors(form.firstName) }}</div>
+            <div class="field">{{ form_label(form.lastName) }}{{ form_widget(form.lastName, {attr:{class:'input'}}) }}{{ form_errors(form.lastName) }}</div>
+            <div class="field">{{ form_label(form.email) }}{{ form_widget(form.email, {attr:{class:'input'}}) }}{{ form_errors(form.email) }}</div>
+            <div class="field">{{ form_label(form.phone) }}{{ form_widget(form.phone, {attr:{class:'input'}}) }}{{ form_errors(form.phone) }}</div>
+            <div class="field">{{ form_label(form.plainPassword) }}{{ form_widget(form.plainPassword, {attr:{class:'input'}}) }}{{ form_errors(form.plainPassword) }}</div>
+
+            <button class="btn btn-block" type="submit" style="margin-top:8px">S'inscrire</button>
+        {{ form_end(form) }}
+
+        <p class="auth-alt">Deja inscrit ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+    </div>
+</div>
+{% endblock %}

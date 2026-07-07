@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+{% block title %}Clients — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'clients'} %}
+    <div class="admin-main">
+        {% for label, messages in app.flashes %}{% for message in messages %}
+            <div class="flash {{ label }}" style="margin-bottom:16px">{{ message }}</div>
+        {% endfor %}{% endfor %}
+
+        <h1>Clients &amp; comptes</h1>
+        <p class="muted">Gérez les accès : blocage, déblocage et suppression des comptes.</p>
+
+        <div class="admin-card" style="margin-top:24px">
+            <table class="table">
+                <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Inscrit le</th><th></th></tr></thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td><strong>{{ user.fullName }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if 'ROLE_SUPER_ADMIN' in user.roles %}
+                                <span class="status-badge preparing">Super-admin</span>
+                            {% elseif 'ROLE_ADMIN' in user.roles %}
+                                <span class="status-badge in_progress">Admin</span>
+                            {% else %}
+                                <span class="status-badge">Client</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.isBlocked %}
+                                <span class="status-badge cancelled">Bloqué</span>
+                            {% else %}
+                                <span class="status-badge shipped">Actif</span>
+                            {% endif %}
+                        </td>
+                        <td class="muted">{{ user.createdAt|date('d/m/Y') }}</td>
+                        <td style="display:flex;gap:8px;justify-content:flex-end">
+                            {% if user != app.user %}
+                                <form method="post" action="{{ path('admin_user_toggle_block', {id: user.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_block' ~ user.id) }}">
+                                    <button class="btn btn-sm btn-outline" type="submit">{{ user.isBlocked ? 'Débloquer' : 'Bloquer' }}</button>
+                                </form>
+                                <form method="post" action="{{ path('admin_user_delete', {id: user.id}) }}" onsubmit="return confirm('Supprimer définitivement ce compte ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_user' ~ user.id) }}">
+                                    <button class="btn btn-sm btn-ghost" type="submit">Supprimer</button>
+                                </form>
+                            {% else %}
+                                <span class="muted" style="font-size:12px">Votre compte</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="muted">Aucun utilisateur.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

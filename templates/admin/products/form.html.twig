@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ mode == 'new' ? 'Nouveau produit' : 'Éditer' }} — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'products'} %}
+    <div class="admin-main">
+        <a href="{{ path('admin_product_index') }}" class="muted" style="font-size:13px">&larr; Retour aux produits</a>
+        <h1 style="margin-top:8px">
+            {{ mode == 'new' ? 'Nouveau produit' : 'Éditer : ' ~ product.name }}
+            <span class="status-badge" style="vertical-align:middle">{{ product.type == 'pattern' ? 'Patron PDF' : 'Création physique' }}</span>
+        </h1>
+
+        <div class="admin-card" style="margin-top:20px;max-width:640px">
+            {{ form_start(form) }}
+                {% if not form.vars.valid %}
+                    <div class="flash error" style="margin-bottom:16px">
+                        Merci de corriger les champs en erreur.
+                        {{ form_errors(form) }}
+                    </div>
+                {% endif %}
+                <div class="field" style="margin-bottom:16px">{{ form_label(form.name) }}{{ form_widget(form.name, {attr:{class:'input'}}) }}{{ form_errors(form.name) }}</div>
+                <div class="field" style="margin-bottom:16px">{{ form_label(form.category) }}{{ form_widget(form.category, {attr:{class:'input'}}) }}{{ form_errors(form.category) }}</div>
+                <div class="field" style="margin-bottom:16px">{{ form_label(form.description) }}{{ form_widget(form.description, {attr:{class:'input'}}) }}{{ form_errors(form.description) }}</div>
+                <div class="field" style="margin-bottom:16px">{{ form_label(form.basePrice) }}{{ form_widget(form.basePrice, {attr:{class:'input'}}) }}{{ form_errors(form.basePrice) }}</div>
+
+                {% if form.stock is defined %}
+                    <div class="measure-grid">
+                        <div class="field">{{ form_label(form.stock) }}{{ form_widget(form.stock, {attr:{class:'input'}}) }}{{ form_errors(form.stock) }}</div>
+                    </div>
+                    <label class="filter-opt" style="margin:12px 0">{{ form_widget(form.requiresMeasurements) }} {{ form_label(form.requiresMeasurements) }}</label>
+                {% endif %}
+
+                {% if form.difficultyLevel is defined %}
+                    <div class="measure-grid">
+                        <div class="field">{{ form_label(form.difficultyLevel) }}{{ form_widget(form.difficultyLevel, {attr:{class:'input'}}) }}</div>
+                        <div class="field">{{ form_label(form.pageCount) }}{{ form_widget(form.pageCount, {attr:{class:'input'}}) }}</div>
+                    </div>
+                    <div class="field" style="margin:16px 0">{{ form_label(form.pdfFilename) }}{{ form_widget(form.pdfFilename, {attr:{class:'input'}}) }}</div>
+                {% endif %}
+
+                <div class="field" style="margin-bottom:16px">{{ form_label(form.imageFilename) }}{{ form_widget(form.imageFilename, {attr:{class:'input'}}) }}
+                    <small class="muted">Dépose l'image dans <code>public/uploads/</code> puis indique son nom ici.</small>
+                </div>
+
+                <label class="filter-opt" style="margin:12px 0">{{ form_widget(form.isPublished) }} {{ form_label(form.isPublished) }}</label>
+                <label class="filter-opt" style="margin:0 0 20px">{{ form_widget(form.isCustomizable) }} {{ form_label(form.isCustomizable) }}</label>
+
+                <button type="submit" class="btn btn-block">{{ mode == 'new' ? 'Créer le produit' : 'Enregistrer' }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

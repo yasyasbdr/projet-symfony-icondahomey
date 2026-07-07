@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+{% block title %}Commandes — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'orders'} %}
+    <div class="admin-main">
+        <h1>Commandes</h1>
+        <div class="admin-card" style="margin-top:24px">
+            <table class="table">
+                <thead><tr><th>Reference</th><th>Client</th><th>Statut</th><th>Progression</th><th>Montant</th><th></th></tr></thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td><strong>{{ order.reference }}</strong></td>
+                        <td>{{ order.customer.fullName }}</td>
+                        <td><span class="status-badge {{ order.status.value }}">{{ order.status.label }}</span></td>
+                        <td style="min-width:120px"><div class="progress"><span style="width:{{ order.progressPercent }}%"></span></div></td>
+                        <td>{{ order.totalAmount }} &euro;</td>
+                        <td><a href="{{ path('admin_order_show', {id: order.id}) }}" class="btn btn-sm btn-outline">Gerer</a></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="muted">Aucune commande.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid footer-grid-3">
+            <div>
+                <div class="brand">Icon Dahomey</div>
+                <p style="font-size:14px;max-width:260px">Crochet. Culture. Crafted to iconic. Des créations faites main, entre patrimoine et modernité.</p>
+            </div>
+            <div>
+                <h5>Boutique</h5>
+                <a href="{{ path('app_catalog') }}">Toutes les creations</a>
+                <a href="{{ path('app_catalog', {customizable: 1}) }}">Sur-mesure</a>
+                <a href="{{ path('app_catalog', {pdf: 1}) }}">Patrons PDF</a>
+            </div>
+            <div>
+                <h5>Aide</h5>
+                <a href="#">Livraison</a>
+                <a href="#">Contact</a>
+                <a href="#">CGV</a>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; {{ "now"|date("Y") }} Icon Dahomey. Tous droits réservés.</div>
+    </div>
+</footer>

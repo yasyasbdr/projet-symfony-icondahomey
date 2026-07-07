@@ -1,0 +1,14 @@
+framework:
+    validation:
+        email_validation_mode: html5
+        # Auto-mapping DESACTIVE : on n'utilise que les contraintes explicites
+        # (#[Assert\...]) posees sur les entites. Evite qu'une colonne non-nulle
+        # comme "slug" (remplie apres coup dans le controleur) soit consideree
+        # comme obligatoire au moment de la validation du formulaire.
+        # auto_mapping:
+        #     App\Entity\: []
+
+when@test:
+    framework:
+        validation:
+            not_compromised_password: false

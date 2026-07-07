@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mes commandes — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container account">
+    {% include 'account/_sidebar.html.twig' with {active: 'orders'} %}
+    <section>
+        <div class="panel-head"><h1>Mes commandes</h1><p class="muted">Suivez l'avancement de vos creations.</p></div>
+        {% for order in orders %}
+            <div class="panel" style="margin-bottom:18px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                        <strong>Commande {{ order.reference }}</strong><br>
+                        <small class="muted">{{ order.createdAt|date('d/m/Y') }} &middot; {{ order.itemCount }} article(s) &middot; {{ order.totalAmount }} &euro;</small>
+                    </div>
+                    <div style="text-align:right">
+                        <span class="status-badge {{ order.status.value }}">{{ order.status.label }}</span><br>
+                        <a href="{{ path('app_order_show', {id: order.id}) }}" class="btn btn-sm btn-outline" style="margin-top:10px">Voir le suivi</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="panel center"><p class="muted">Aucune commande pour le moment.</p></div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

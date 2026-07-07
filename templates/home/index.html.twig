@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+{% block title %}Icon Dahomey — Crochet, culture, crafted to iconic{% endblock %}
+
+{% block main %}
+<section class="container hero">
+    <div>
+        <div class="eyebrow">Fait main &middot; Edition limitee</div>
+        <h1>Crochet.<br>Culture.<br>Crafted to iconic.</h1>
+        <p>Des pieces uniques au crochet, entre heritage et couture contemporaine. Portez une creation, ou realisez la votre avec nos patrons.</p>
+        <a href="{{ path('app_catalog') }}" class="btn">Decouvrir la collection</a>
+    </div>
+    <div class="hero-img">
+        <img src="{{ asset('uploads/haut1.jpg') }}" alt="Création Icon Dahomey" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span class=\'monogram\' style=\'display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-script);font-size:90px;color:var(--line-strong)\'>Icon</span>'">
+    </div>
+</section>
+
+<section class="container" style="padding-bottom:40px">
+    <form class="search-bar" method="get" action="{{ path('app_catalog') }}">
+        <input type="text" name="q" placeholder="Rechercher une creation, un patron...">
+        <button class="btn btn-sm" type="submit">Rechercher</button>
+    </form>
+</section>
+
+<section class="container section">
+    <div class="section-head">
+        <h2>Nouveautes</h2>
+        <a href="{{ path('app_catalog') }}">Tout voir</a>
+    </div>
+    <div class="grid grid-4">
+        {% for product in latest %}
+            {% include '_partials/product_card.html.twig' %}
+        {% else %}
+            <p class="muted">Aucune creation publiee pour le moment.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="container section" style="padding-top:0">
+    <div class="split">
+        <div class="split-img"><img src="{{ asset('uploads/process_creation.jpg') }}" alt="Le processus de création" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span class=\'monogram\' style=\'display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-script);font-size:70px;color:var(--line-strong)\'>Story</span>'"></div>
+        <div>
+            <div class="eyebrow">Notre histoire</div>
+            <h2 style="font-size:34px;margin-bottom:16px">Le crochet comme signature culturelle</h2>
+            <p class="muted" style="margin-bottom:20px">Chaque piece Icon Dahomey est crochetee a la main, inspiree par un patrimoine textile riche et reinterpretee pour aujourd'hui. Nous proposons aussi bien des creations pretes a porter que des patrons PDF pour les passionnes.</p>
+            <a href="{{ path('app_catalog') }}" class="btn btn-outline">Explorer</a>
+        </div>
+    </div>
+</section>
+
+<section class="container section" style="padding-top:0">
+    <div class="offer">
+        <div class="offer-card"><div class="ic">&#9733;</div><h3>Pret-a-porter</h3><p>Des creations uniques, crochetees main et livrees chez vous.</p></div>
+        <div class="offer-card"><div class="ic">&#9998;</div><h3>Sur-mesure</h3><p>Personnalisez une piece a vos mensurations et a vos envies.</p></div>
+        <div class="offer-card"><div class="ic">&#128196;</div><h3>Patrons PDF</h3><p>Telechargez nos patrons et crochetez vous-meme vos pieces.</p></div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ order.reference }} — Admin{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block main %}
+<div class="admin-shell">
+    {% include 'admin/_sidebar.html.twig' with {active: 'orders'} %}
+    <div class="admin-main">
+        {% for label, messages in app.flashes %}{% for message in messages %}
+            <div class="flash {{ label }}" style="margin-bottom:16px">{{ message }}</div>
+        {% endfor %}{% endfor %}
+
+        <h1>Commande {{ order.reference }}</h1>
+        <p class="muted">{{ order.customer.fullName }} &middot; {{ order.customer.email }} &middot; {{ order.createdAt|date('d/m/Y H:i') }}</p>
+
+        <div class="two-col" style="margin-top:24px">
+            <div>
+                <div class="admin-card">
+                    <h2>Articles</h2>
+                    {% for item in order.items %}
+                        <div class="order-line">
+                            <div class="thumb"></div>
+                            <div class="meta">
+                                <div class="nm">{{ item.productName }}</div>
+                                <small>{{ item.selectedType.label }} &middot; Qte {{ item.quantity }}</small>
+                                {% if item.measurements %}
+                                    <div style="margin-top:6px;font-size:12px" class="muted">
+                                        {% for k, v in item.measurements %}{{ k }}: {{ v }}cm{{ not loop.last ? ' &middot; ' }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="price">{{ item.lineTotal }} &euro;</div>
+                        </div>
+                    {% endfor %}
+                    <div style="text-align:right;margin-top:14px;font-family:var(--font-display);font-size:20px;font-weight:600">Total : {{ order.totalAmount }} &euro;</div>
+                </div>
+
+                {% if order.customer.customizationRequests|length %}
+                <div class="admin-card">
+                    <h2>Demandes de personnalisation</h2>
+                    {% for cr in order.customer.customizationRequests %}
+                        <div class="info-box" style="margin-bottom:12px">
+                            <strong>{{ cr.product.name }}</strong>
+                            <p class="muted" style="margin:6px 0">{{ cr.description }}</p>
+                            <div style="display:flex;gap:10px;align-items:center">
+                                <span class="status-badge {{ cr.status.value == 'pending' ? 'pending' }}">{{ cr.status.label }}</span>
+                                {% if cr.proposedPrice %}<strong>{{ cr.proposedPrice }} &euro;</strong>{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <div class="admin-card">
+                    <h2>Mettre a jour le statut</h2>
+                    <form method="post" action="{{ path('admin_order_update', {id: order.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('order_update' ~ order.id) }}">
+                        <div class="field" style="margin-bottom:14px">
+                            <label>Statut</label>
+                            <select name="status">
+                                {% for s in statuses %}
+                                    <option value="{{ s.value }}" {{ order.status == s ? 'selected' }}>{{ s.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field" style="margin-bottom:14px">
+                            <label>Progression : <span id="pv">{{ order.progressPercent }}</span>%</label>
+                            <input class="range" type="range" name="progress" min="0" max="100" value="{{ order.progressPercent }}"
+                                   oninput="document.getElementById('pv').textContent=this.value">
+                        </div>
+                        <div class="field" style="margin-bottom:14px">
+                            <label>Numero de suivi (si expedie)</label>
+                            <input class="input" type="text" name="tracking_number" value="{{ order.trackingNumber }}">
+                        </div>
+                        <div class="field" style="margin-bottom:14px">
+                            <label>Transporteur</label>
+                            <input class="input" type="text" name="carrier" value="{{ order.carrier }}">
+                        </div>
+                        <div class="field" style="margin-bottom:16px">
+                            <label>Commentaire (visible dans l'historique)</label>
+                            <textarea class="input" name="comment" rows="2"></textarea>
+                        </div>
+                        <button class="btn btn-block" type="submit">Enregistrer</button>
+                    </form>
+                </div>
+
+                <div class="admin-card">
+                    <h2>Historique</h2>
+                    {% for h in order.statusHistory %}
+                        <div style="padding:10px 0;border-bottom:1px solid var(--line);font-size:13px">
+                            <strong>{{ h.status.label }}</strong> — {{ h.progressPercent }}%
+                            <div class="muted">{{ h.createdAt|date('d/m/Y H:i') }}{% if h.comment %} &middot; {{ h.comment }}{% endif %}</div>
+                        </div>
+                    {% else %}
+                        <p class="muted">Aucun changement enregistre.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

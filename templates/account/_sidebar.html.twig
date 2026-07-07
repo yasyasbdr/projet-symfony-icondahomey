@@ -1,0 +1,15 @@
+<aside class="account-side">
+    <div class="who">
+        <div class="avatar">{{ app.user.firstName|first|upper }}{{ app.user.lastName|first|upper }}</div>
+        <div>
+            <strong>{{ app.user.fullName }}</strong><br>
+            <small class="muted">{{ app.user.email }}</small>
+        </div>
+    </div>
+    <nav class="account-nav">
+        <a href="{{ path('app_order_index') }}" class="{{ active == 'orders' ? 'active' }}">&#128230; Mes commandes</a>
+        <a href="{{ path('app_favorites') }}" class="{{ active == 'favorites' ? 'active' }}">&#9825; Mes favoris</a>
+        <a href="#" class="{{ active == 'messaging' ? 'active' }}">&#9993; Messagerie</a>
+        <a href="{{ path('app_logout') }}">&#8617; Deconnexion</a>
+    </nav>
+</aside>

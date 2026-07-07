@@ -1,0 +1,24 @@
+{# @var product App\Entity\Product #}
+<article class="product-card">
+    <div class="prod-img">
+        <span class="monogram">ID</span>
+        {% if product.mainImage %}
+            <img src="{{ asset('uploads/' ~ product.mainImage.filename) }}" alt="{{ product.name }}" onerror="this.style.display='none'">
+        {% endif %}
+        <span class="pill {{ product.type }}">{{ product.type == 'pattern' ? 'Patron PDF' : 'Création' }}</span>
+        {% if app.user %}
+            <form method="post" action="{{ path('app_favorite_toggle', {id: product.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('favorite' ~ product.id) }}">
+                <button class="fav-btn {{ app.user.hasFavorite(product) ? 'is-fav' : '' }}" type="submit" aria-label="Favori">
+                    {{ app.user.hasFavorite(product) ? '&#9829;'|raw : '&#9825;'|raw }}
+                </button>
+            </form>
+        {% endif %}
+    </div>
+    <div class="product-body">
+        <span class="cat">{{ product.category ? product.category.name : 'Creation' }}</span>
+        <h3><a href="{{ path('app_product_show', {slug: product.slug}) }}">{{ product.name }}</a></h3>
+        <span class="price">{{ product.basePrice }} &euro;</span>
+        <a href="{{ path('app_product_show', {slug: product.slug}) }}" class="btn btn-sm btn-outline btn-block">Voir la création</a>
+    </div>
+</article>

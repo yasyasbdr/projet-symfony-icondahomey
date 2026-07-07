@@ -1,0 +1,15 @@
+<aside class="admin-side">
+    <div class="admin-brand">Icon Dahomey<small>Administration</small></div>
+    <nav class="admin-nav" style="margin-top:20px">
+        <a href="{{ path('admin_dashboard') }}" class="{{ active == 'dashboard' ? 'active' }}">&#9632; Tableau de bord</a>
+        <a href="{{ path('admin_order_index') }}" class="{{ active == 'orders' ? 'active' }}">&#128230; Commandes</a>
+        <a href="#" class="{{ active == 'messages' ? 'active' }}">&#9993; Messages</a>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <a href="{{ path('admin_product_index') }}" class="{{ active == 'products' ? 'active' }}">&#9733; Produits</a>
+            <a href="{{ path('admin_user_index') }}" class="{{ active == 'clients' ? 'active' }}">&#9787; Clients</a>
+        {% endif %}
+    </nav>
+    <div style="margin-top:auto">
+        <a href="{{ path('app_home') }}" class="admin-nav" style="display:block"><span style="display:flex;gap:12px;padding:12px 14px;color:#B7AF9E">&#8617; Retour au site</span></a>
+    </div>
+</aside>

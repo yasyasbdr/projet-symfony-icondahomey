@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% block title %}Connexion — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="auth-wrap">
+        <h1>Connexion</h1>
+        <p class="sub">Ravi de vous revoir.</p>
+
+        {% if error %}
+            <div class="flash error" style="margin-bottom:18px">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <form method="post">
+            <div class="field">
+                <label for="username">Email</label>
+                <input class="input" type="email" id="username" name="_username" value="{{ last_username }}" required autofocus>
+            </div>
+            <div class="field">
+                <label for="password">Mot de passe</label>
+                <input class="input" type="password" id="password" name="_password" required>
+            </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <label class="filter-opt" style="margin:6px 0 18px"><input type="checkbox" name="_remember_me"> Se souvenir de moi</label>
+            <button class="btn btn-block" type="submit">Se connecter</button>
+        </form>
+
+        <p class="auth-alt">Pas encore de compte ? <a href="{{ path('app_register') }}">Créer un compte</a></p>
+    </div>
+</div>
+{% endblock %}

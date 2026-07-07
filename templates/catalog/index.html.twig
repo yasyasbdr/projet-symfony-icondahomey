@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+{% block title %}Boutique — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container catalog">
+    <aside class="filters">
+        <form method="get" action="{{ path('app_catalog') }}">
+            <h4>Categories</h4>
+            <label class="filter-opt"><input type="radio" name="category" value="" {{ filters.category is empty ? 'checked' }}> Toutes</label>
+            {% for c in categories %}
+                <label class="filter-opt"><input type="radio" name="category" value="{{ c.slug }}" {{ filters.category == c.slug ? 'checked' }}> {{ c.name }}</label>
+            {% endfor %}
+
+            <h4>Prix (&euro;)</h4>
+            <div class="price-row">
+                <input type="number" name="price_min" placeholder="Min" value="{{ filters.priceMin }}">
+                <input type="number" name="price_max" placeholder="Max" value="{{ filters.priceMax }}">
+            </div>
+
+            <h4>Disponibilite</h4>
+            <label class="filter-opt"><input type="checkbox" name="pdf" value="1" {{ filters.pdfOnly ? 'checked' }}> Patron PDF uniquement</label>
+            <label class="filter-opt"><input type="checkbox" name="customizable" value="1" {{ filters.customizable ? 'checked' }}> Personnalisable</label>
+
+            <h4>Trier par</h4>
+            <select name="sort">
+                <option value="newest" {{ filters.sort == 'newest' ? 'selected' }}>Nouveautes</option>
+                <option value="price_asc" {{ filters.sort == 'price_asc' ? 'selected' }}>Prix croissant</option>
+                <option value="price_desc" {{ filters.sort == 'price_desc' ? 'selected' }}>Prix decroissant</option>
+                <option value="name" {{ filters.sort == 'name' ? 'selected' }}>Nom (A-Z)</option>
+            </select>
+
+            <button type="submit" class="btn btn-block" style="margin-top:22px">Appliquer</button>
+        </form>
+    </aside>
+
+    <div>
+        <div class="catalog-head">
+            <h1>Boutique</h1>
+            <span class="muted">{{ total }} creation{{ total > 1 ? 's' }}</span>
+        </div>
+        <div class="grid grid-3">
+            {% for product in products %}
+                {% include '_partials/product_card.html.twig' %}
+            {% else %}
+                <p class="muted">Aucune creation ne correspond a ces filtres.</p>
+            {% endfor %}
+        </div>
+
+        {% if pages > 1 %}
+            <div class="pagination">
+                {% for p in 1..pages %}
+                    {% if p == page %}
+                        <span class="active">{{ p }}</span>
+                    {% else %}
+                        <a href="{{ path('app_catalog', app.request.query.all|merge({page: p})) }}">{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

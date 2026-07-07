@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+{% block title %}Commande {{ order.reference }} — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container account">
+    {% include 'account/_sidebar.html.twig' with {active: 'orders'} %}
+    <section>
+        <div class="panel" style="margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><h1 style="font-size:26px">Commande {{ order.reference }}</h1>
+                    <p class="muted">Passee le {{ order.createdAt|date('d/m/Y') }}</p></div>
+                <span class="status-badge {{ order.status.value }}">{{ order.status.label }}</span>
+            </div>
+
+            {# Timeline "fil de laine" #}
+            <div class="block-label">Suivi de fabrication</div>
+            <div class="timeline">
+                {% for step in timeline %}
+                    <div class="step {{ order.status.timelineIndex >= step.timelineIndex ? 'done' }}">
+                        <div class="dot">{{ order.status.timelineIndex > step.timelineIndex ? '&#10003;'|raw : loop.index }}</div>
+                        <div class="lbl">{{ step.label }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="progress"><span style="width:{{ order.progressPercent }}%"></span></div>
+            <p class="muted center" style="margin-top:8px;font-size:13px">{{ order.progressPercent }}% realise</p>
+        </div>
+
+        <div class="panel" style="margin-bottom:20px">
+            <div class="block-label">Articles</div>
+            {% for item in order.items %}
+                <div class="order-line">
+                    <div class="thumb"></div>
+                    <div class="meta">
+                        <div class="nm">{{ item.productName }}</div>
+                        <small>{{ item.selectedType.label }} &middot; Qte {{ item.quantity }}
+                        {% if item.measurements %} &middot; mensurations fournies{% endif %}</small>
+                    </div>
+                    <div class="price">{{ item.lineTotal }} &euro;</div>
+                </div>
+            {% endfor %}
+            <div style="text-align:right;margin-top:16px;font-family:var(--font-display);font-size:20px;font-weight:600">Total : {{ order.totalAmount }} &euro;</div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <h4>Livraison</h4>
+                    {% if order.shippingAddress %}
+                        {{ order.shippingAddress.recipientName }}<br>
+                        {{ order.shippingAddress.line1 }}<br>
+                        {{ order.shippingAddress.postalCode }} {{ order.shippingAddress.city }}
+                    {% else %}<span class="muted">Adresse non renseignee</span>{% endif %}
+                    {% if order.trackingNumber %}<br><small class="muted">Suivi {{ order.carrier }} : {{ order.trackingNumber }}</small>{% endif %}
+                </div>
+                <div class="info-box">
+                    <h4>Paiement</h4>
+                    {% if order.payment %}
+                        {{ order.payment.method|default('Carte bancaire') }}<br>
+                        <span class="muted">{{ order.payment.amount }} {{ order.payment.currency }} &middot; {{ order.payment.status }}</span>
+                    {% else %}<span class="muted">En attente</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Messagerie interne #}
+        <div class="panel">
+            <div class="block-label">Messagerie</div>
+            {% set conv = order.customer.conversations|first %}
+            <div class="chat">
+                <div class="chat-log">
+                    {% if conv %}
+                        {% for m in conv.messages %}
+                            <div class="bubble {{ m.sender == app.user ? 'me' : 'them' }}">
+                                {{ m.content }}
+                                <span class="t">{{ m.sender.firstName }} &middot; {{ m.createdAt|date('d/m H:i') }}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="muted center">Aucun message. Ecrivez-nous a propos de cette commande.</p>
+                    {% endif %}
+                </div>
+                <form class="chat-form" method="post" action="{{ path('app_order_show', {id: order.id}) }}">
+                    <input type="text" name="message" placeholder="Votre message..." required>
+                    <button class="btn btn-sm" type="submit">Envoyer</button>
+                </form>
+            </div>
+        </div>
+
+        {% if order.status.value in ['pending','confirmed','in_progress'] %}
+            <form method="post" action="{{ path('app_order_cancel', {id: order.id}) }}" style="margin-top:16px">
+                <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ order.id) }}">
+                <button class="btn btn-ghost btn-sm" type="submit" onclick="return confirm('Annuler cette commande ?')">Annuler la commande</button>
+            </form>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

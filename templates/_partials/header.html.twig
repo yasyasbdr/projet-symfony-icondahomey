@@ -1,0 +1,37 @@
+<header class="site-header">
+    <nav class="nav">
+        <div class="nav-links">
+            <a href="{{ path('app_home') }}">Accueil</a>
+            <a href="{{ path('app_catalog') }}">Boutique</a>
+            <a href="{{ path('app_catalog', {customizable: 1}) }}">Sur-mesure</a>
+            <a href="{{ path('app_catalog', {pdf: 1}) }}">Patrons PDF</a>
+        </div>
+
+        <a href="{{ path('app_home') }}" class="brand">Icon Dahomey</a>
+
+        <div class="nav-actions">
+            <a href="{{ path('app_catalog') }}" aria-label="Rechercher" title="Rechercher">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            </a>
+
+            {% if app.user %}
+                <a href="{{ path('app_favorites') }}" aria-label="Favoris" title="Mes favoris">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                </a>
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_dashboard') : path('app_order_index') }}" aria-label="Mon espace" title="{{ is_granted('ROLE_ADMIN') ? 'Administration' : 'Mes commandes' }}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                </a>
+                <a href="{{ path('app_cart') }}" aria-label="Panier" title="Panier" style="position:relative">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    {% if app.user.cart %}<span class="badge-count">{{ app.user.cart.itemCount }}</span>{% endif %}
+                </a>
+                <a href="{{ path('app_logout') }}" class="btn btn-sm btn-ghost" style="padding:7px 14px">Deconnexion</a>
+            {% else %}
+                <a href="{{ path('app_cart') }}" aria-label="Panier" title="Panier">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </a>
+                <a href="{{ path('app_login') }}" class="btn btn-sm" style="padding:7px 16px;color:white;">Connexion</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>

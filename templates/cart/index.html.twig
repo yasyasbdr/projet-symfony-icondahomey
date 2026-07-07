@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mon panier — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container" style="padding:40px 0 72px">
+    <h1 style="font-size:34px;margin-bottom:24px">Mon panier</h1>
+
+    {% if cart.items|length > 0 %}
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start">
+            <div class="panel">
+                {% for item in cart.items %}
+                    <div class="order-line">
+                        <div class="thumb" style="{% if item.product.mainImage %}background-image:url('{{ asset('uploads/' ~ item.product.mainImage.filename) }}');background-size:cover;background-position:center{% endif %}"></div>
+                        <div class="meta">
+                            <div class="nm"><a href="{{ path('app_product_show', {slug: item.product.slug}) }}">{{ item.product.name }}</a></div>
+                            <small>{{ item.selectedType.label }} &middot; {{ item.product.basePrice }} € / unité</small>
+                            <form method="post" action="{{ path('app_cart_update', {id: item.id}) }}" style="display:flex;gap:8px;align-items:center;margin-top:8px">
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="input" style="width:72px;padding:6px 8px">
+                                <button class="btn btn-sm btn-outline" type="submit">Maj</button>
+                            </form>
+                        </div>
+                        <div style="text-align:right">
+                            <div class="price">{{ item.lineTotal }} €</div>
+                            <form method="post" action="{{ path('app_cart_remove', {id: item.id}) }}" style="margin-top:6px">
+                                <input type="hidden" name="_token" value="{{ csrf_token('cart_remove' ~ item.id) }}">
+                                <button class="btn btn-sm btn-ghost" type="submit">Retirer</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <aside class="panel">
+                <h2 style="font-size:20px;margin-bottom:16px">Récapitulatif</h2>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="muted">Articles</span><span>{{ cart.itemCount }}</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-family:var(--font-display);font-size:22px;font-weight:600"><span>Total</span><span>{{ cart.total }} €</span></div>
+                <a href="{{ path('app_checkout') }}" class="btn btn-block">Passer commande</a>
+                <a href="{{ path('app_catalog') }}" class="btn btn-block btn-outline" style="margin-top:10px">Continuer mes achats</a>
+            </aside>
+        </div>
+    {% else %}
+        <div class="panel center">
+            <p class="muted">Votre panier est vide.</p>
+            <a href="{{ path('app_catalog') }}" class="btn" style="margin-top:16px">Découvrir la boutique</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

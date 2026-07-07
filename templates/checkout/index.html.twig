@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+{% block title %}Paiement — Icon Dahomey{% endblock %}
+
+{% block main %}
+<div class="container" style="padding:40px 0 72px;max-width:720px">
+    <h1 style="font-size:32px;margin-bottom:6px">Récapitulatif &amp; paiement</h1>
+    <p class="muted" style="margin-bottom:24px">Vérifiez votre commande avant de payer.</p>
+
+    <div class="panel" style="margin-bottom:20px">
+        {% for item in cart.items %}
+            <div class="order-line">
+                <div class="thumb" style="{% if item.product.mainImage %}background-image:url('{{ asset('uploads/' ~ item.product.mainImage.filename) }}');background-size:cover;background-position:center{% endif %}"></div>
+                <div class="meta">
+                    <div class="nm">{{ item.product.name }}</div>
+                    <small>{{ item.selectedType.label }} &middot; Qté {{ item.quantity }}</small>
+                </div>
+                <div class="price">{{ item.lineTotal }} €</div>
+            </div>
+        {% endfor %}
+        <div style="text-align:right;margin-top:16px;font-family:var(--font-display);font-size:22px;font-weight:600">Total : {{ cart.total }} €</div>
+    </div>
+
+    <div class="panel">
+        <h2 style="font-size:18px;margin-bottom:12px">Paiement</h2>
+        {% if stripe_enabled %}
+            <p class="muted" style="margin-bottom:16px">Vous allez être redirigé vers le paiement sécurisé Stripe.</p>
+        {% else %}
+            <p class="muted" style="margin-bottom:16px">Mode démonstration : le paiement est simulé (aucune carte requise). Configurez une clé Stripe de test pour activer le vrai paiement.</p>
+        {% endif %}
+        <form method="post" action="{{ path('app_checkout') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
+            <button type="submit" class="btn btn-block">
+                {{ stripe_enabled ? 'Payer avec Stripe' : 'Payer ' ~ cart.total ~ ' € (simulé)' }}
+            </button>
+        </form>
+        <a href="{{ path('app_cart') }}" class="btn btn-block btn-outline" style="margin-top:10px">Retour au panier</a>
+    </div>
+</div>
+{% endblock %}
