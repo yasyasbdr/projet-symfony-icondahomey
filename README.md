@@ -1,4 +1,5 @@
-# Icon Dahomey — Plateforme e-commerce (Symfony 7)
+# Icon Dahomey - Plateforme e-commerce Icon Dahomey
+Nom / Prénom / Compte Github : BADAROU Yasmine @yasyasbdr
 
 Boutique de créations au crochet : catalogue filtrable (créations physiques + patrons PDF),
 panier persisté, tunnel de commande avec paiement Stripe, suivi de fabrication,
